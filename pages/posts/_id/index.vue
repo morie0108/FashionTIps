@@ -1,7 +1,6 @@
 <template>
   <section class="container">
     <h1>{{ post.fields.title }}</h1>
-
     <v-row>
       <v-col>
         <div v-html="toHtmlString(post.fields.body)"></div>
@@ -19,6 +18,10 @@ const client = createClient()
 export default {
   async asyncData({ params, payload }) {
     // IDをキーに記事を取得
+    if (payload)
+      return {
+        post: payload
+      }
     const entry = await client.getEntry(params.id)
     return {
       post: entry

@@ -1,6 +1,11 @@
 import colors from 'vuetify/es5/util/colors'
+import { createClient } from './plugins/contentful.js'
 const environment = process.env.NODE_ENV || "development";
-const envSet = require(`./env.${environment}.js`);
+let envSet = {}
+if (environment !== 'production') {
+  envSet = require(`./env.${environment}.js`)
+}
+// const envSet = require(`./env.${environment}.js`);
 
 export default {
   mode: 'universal',
@@ -88,5 +93,21 @@ export default {
       /*
      ** Add env
      */
-  env: envSet
+  env: envSet,
+
+  generate: {
+    routes() {
+      const client = createClient()
+      return client
+        .getEntries({ content_type: process.env.CTFL_CONTENT_TYPE_POST })
+        .then((entries) => {
+          return entries.items.map((entry) => {
+            return {
+              route: '/posts/' + entry.sys.id,
+              payload: entry
+            }
+          })
+        })
+    }
+  }
 }
